@@ -22,7 +22,7 @@ class KDC:
 	def setUpCommonKey( self, clientIdA, clientIdB ):
 		r = RSA()
 		
-		_aes = AESCipher( 16 )
+		_aes = AESCipher( 32 )
 		KABkey = _aes.key.hex()
 
 		KABid = json.dumps( { 'A' : clientIdA.hex(), 'B' : clientIdB.hex() } )	# Making the ID a string
@@ -43,7 +43,7 @@ class Client:
 		self.identity = urandom( keySize )
 
 	def decryptCommonKey( self, ctxt ):
-		self._aes = AESCipher( 16 )
+		self._aes = AESCipher( 32 )
 		self.commonKey =  bytes.fromhex( self.r.Dec( ctxt = ctxt ) )
 		self._aes.setKey( self.commonKey )	# Setting the common key
 
@@ -54,8 +54,26 @@ class Client:
 	def encyptMessage( self, msg ):
 		return self._aes.encrypt( msg )
 
+# Returns ~87 keys per second
 def timeKDC():
+	# Set up
+	keySize = 512
+	K = KDC( keySize )
+	
+	iterations = 100
+	Alice = Client( keySize )
+	Bob = Client( keySize )
+	K.addClientKey( Alice.identity, Alice.pubKey )
+	K.addClientKey( Bob.identity, Bob.pubKey )
 
+	start = time()
+	for _ in range(iterations):
+		K.setUpCommonKey( Alice.identity, Bob.identity )
+
+	totalTime = time() - start
+	keysPerSecond = iterations / totalTime
+	print('Total time:', totalTime)
+	print('Key per second:', keysPerSecond)
 
 # This function runs the program
 def main():
@@ -78,7 +96,8 @@ def main():
 	assert( Alice.commonKey == Bob.commonKey )
 	assert( Bob.decryptMessage( AliceId ) == Alice.identity.hex() )
 
-main()
+if __name__ == '__main__':
+	timeKDC()
 
 
 
