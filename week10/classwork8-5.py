@@ -1,5 +1,5 @@
 from Crypto.Cipher import AES
-from Crypto.Hash import SHA512
+from Crypto.Hash import SHA256
 from Crypto.Random import get_random_bytes
 import hashlib
 import numpy as np
@@ -15,25 +15,25 @@ unpad = lambda s: s[:-ord(s[len(s) - 1:])]
 class Peer(object):
 	def __init__(self, key, name):
 		fill = 32
-		h = SHA512.new()
+		h = SHA256.new()
 		key = key.encode("utf-8")
 		if name == "alice":
 			self.receiveAuthKey = h.update( key + "Bob2AliceAuth".encode("utf-8") )
-			self.receiveAuthKey = bytes.fromhex(h.hexdigest()).zfill(fill); h = SHA512.new()
+			self.receiveAuthKey = bytes.fromhex(h.hexdigest()).zfill(fill); h = SHA256.new()
 			self.sendAuthKey = h.update( key + 	"Alice2BobAuth".encode("utf-8") )
-			self.sendAuthKey = bytes.fromhex(h.hexdigest()).zfill(fill); h = SHA512.new()
+			self.sendAuthKey = bytes.fromhex(h.hexdigest()).zfill(fill); h = SHA256.new()
 			self.receiveEncKey = h.update( key + 	"Bob2AliceEnc".encode("utf-8") )
-			self.receiveEncKey = bytes.fromhex(h.hexdigest()).zfill(fill); h = SHA512.new()
+			self.receiveEncKey = bytes.fromhex(h.hexdigest()).zfill(fill); h = SHA256.new()
 			self.sendEncKey = h.update( key + 	"Alice2BobEnc".encode("utf-8") )
 			self.sendEncKey = bytes.fromhex(h.hexdigest()).zfill(fill)
 		elif name == "bob":
-			h = SHA512.new()
+			h = SHA256.new()
 			self.receiveAuthKey = h.update( key + "Alice2BobAuth".encode("utf-8") )
-			self.receiveAuthKey = bytes.fromhex(h.hexdigest()).zfill(fill); h = SHA512.new()
+			self.receiveAuthKey = bytes.fromhex(h.hexdigest()).zfill(fill); h = SHA256.new()
 			self.sendAuthKey = h.update( key + 	"Bob2AliceAuth".encode("utf-8") )
-			self.sendAuthKey = bytes.fromhex(h.hexdigest()).zfill(fill); h = SHA512.new()
+			self.sendAuthKey = bytes.fromhex(h.hexdigest()).zfill(fill); h = SHA256.new()
 			self.receiveEncKey = h.update( key + 	"Alice2BobEnc".encode("utf-8") )
-			self.receiveEncKey = bytes.fromhex(h.hexdigest()).zfill(fill); h = SHA512.new()
+			self.receiveEncKey = bytes.fromhex(h.hexdigest()).zfill(fill); h = SHA256.new()
 			self.sendEncKey = h.update( key + 	"Bob2AliceEnc".encode("utf-8") )
 			self.sendEncKey = bytes.fromhex(h.hexdigest()).zfill(fill)
 		else:
@@ -43,7 +43,7 @@ class Peer(object):
 		self.count = -1
 		
 	def send(self, msg):
-		h = SHA512.new()
+		h = SHA256.new()
 		iv = urandom(16)
 		c = AES.new(self.sendEncKey[:32], AES.MODE_CBC, iv)
 		msg = msg.encode("utf-8").zfill(32)
