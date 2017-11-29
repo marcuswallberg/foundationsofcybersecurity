@@ -6,7 +6,6 @@ import numpy as np
 from os import urandom
 import cbor
 from time import time
-from certificate3 import *	# Our certificate class
 
 BLOCK_SIZE = 16
 pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * \
