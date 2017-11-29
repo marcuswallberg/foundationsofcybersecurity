@@ -68,6 +68,10 @@ class RSA:
 			privKey = self.privKey
 		d, n = privKey
 		hashToInt = int( self.H( msg.encode("utf-8") ), 16 )
+
+		if (n < hashToInt):
+			raise Exception("n is smaller than msg, make the message short or min prime longer")
+
 		signed = pow( hashToInt, d, n )
 		return signed
 
