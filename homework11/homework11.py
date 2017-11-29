@@ -1,4 +1,10 @@
-from certificate3 import *
+"""
+Homework 11
+Authors:
+Marcus Wallberg & Johanna Gustafsson
+"""
+
+from certificate import *
 from classwork8 import *
 
 # Initializing the CA
